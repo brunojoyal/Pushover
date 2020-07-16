@@ -43,7 +43,7 @@ void Pushover::setHTML(boolean html) {
 }
 boolean Pushover::send(void) {
 	WiFiClient client;
-	if (!client.connect("api.pushover.net", 443)) {
+	if (!client.connect("api.pushover.net", 80)) {
 		return false;
 	}
 	String post = String("token=")+_token+"&user="+_user+"&title="+_title+"&message="+_message+"&device="+_device+"&url="+_url+"&url_title="+_url_title+"&priority="+_priority+"&retry="+_retry+"&expire="+_expire+"&sound="+_sound;
