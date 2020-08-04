@@ -1,4 +1,8 @@
-#include <WiFiClientSecure.h>
+#ifndef Pushover
+#define Pushover
+
+#include <Arduino.h>
+#include <WiFiClient.h>
 
 enum SafeMode {
 	SAFE = 0,
@@ -38,3 +42,5 @@ class Pushover {
 		void setTimeout(uint16_t);
 		boolean send(void);
 };
+
+#endif
