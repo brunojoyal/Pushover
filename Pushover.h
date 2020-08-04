@@ -3,7 +3,8 @@
 
 #include <Arduino.h>
 #include <WiFiClient.h>
-
+#include <WiFiClientSecure.h>
+#include <HTTPClient.h>
 enum SafeMode {
 	SAFE = 0,
 	UNSAFE = 1
