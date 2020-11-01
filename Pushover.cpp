@@ -79,41 +79,47 @@ void Pushover::setHTML(boolean html)
 }
 bool Pushover::send(void)
 {
+	bool success=false;
+	WiFiClientSecure *client = new WiFiClientSecure;
 
-	WiFiClientSecure client;
-
-
-	client.setCACert(PUSHOVER_ROOT_CA);
-
-	if (client.connect("api.pushover.net", 443))
+	if (client)
 	{
-		Serial.println("https connection established.");
-		String post = String("token=") + _token + "&user=" + _user + "&title=" + _title + "&message=" + _message + "&device=" + _device + "&url=" + _url + "&url_title=" + _url_title + "&priority=" + _priority + "&retry=" + _retry + "&expire=" + _expire + "&sound=" + _sound;
-		if (_timestamp != 0)
-			post += String("&timestamp=") + _timestamp;
-		if (_html == true)
-			post += String("&html=1");
-		String http = String("POST /1/messages.json HTTP/1.1\r\nHost: api.pushover.net\r\nConnection: close\r\nContent-Length: ") + post.length() + "\r\n\r\n" + post;
-		client.print(http);
-		int timeout_at = millis() + _timeout;
-		while (!client.available() && timeout_at - millis() < 0)
-		{
-			client.stop();
-			return false;
-		}
-		String line;
-		while (client.available() != 0)
-		{
-			if (client.read() == '{')
-				break;
-		}
-		line = client.readStringUntil('\n');
-		return line.indexOf("\"status\":1") != -1 || line.indexOf("200 OK") != -1;
-	}
-	else
-	{
-		return false;
-	}
-	
 
+		client->setCACert(PUSHOVER_ROOT_CA);
+		{
+			if (client->connect("api.pushover.net", 443))
+			{
+				Serial.println("https connection established.");
+				String post = String("token=") + _token + "&user=" + _user + "&title=" + _title + "&message=" + _message + "&device=" + _device + "&url=" + _url + "&url_title=" + _url_title + "&priority=" + _priority + "&retry=" + _retry + "&expire=" + _expire + "&sound=" + _sound;
+				if (_timestamp != 0)
+					post += String("&timestamp=") + _timestamp;
+				if (_html == true)
+					post += String("&html=1");
+				String http = String("POST /1/messages.json HTTP/1.1\r\nHost: api.pushover.net\r\nConnection: close\r\nContent-Length: ") + post.length() + "\r\n\r\n" + post;
+				client->print(http);
+				int timeout_at = millis() + _timeout;
+				while (!client->available() && timeout_at - millis() < 0)
+				{
+					client->stop();
+					return false;
+				}
+				String line;
+				while (client->available() != 0)
+				{
+					if (client->read() == '{')
+						break;
+				}
+				line = client->readStringUntil('\n');
+				client->stop();
+				success=line.indexOf("\"status\":1") != -1 || line.indexOf("200 OK") != -1;
+			}
+			else
+			{
+				success=false;
+				client->stop();
+			}
+		}
+		delete client;
+	}
+	return success;
 }
