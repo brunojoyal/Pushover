@@ -1,5 +1,4 @@
 #include "Pushover.h"
-
 const char *PUSHOVER_ROOT_CA = "-----BEGIN CERTIFICATE-----\n"
 							   "MIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh\n"
 							   "MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\n"
@@ -32,6 +31,14 @@ Pushover::Pushover(String token, String user, bool unsafe = false)
 void Pushover::setMessage(String message)
 {
 	_message = message;
+}
+void Pushover::setToken(String token)
+{
+	_token = token;
+}
+void Pushover::setUser(String user)
+{
+	_user = user;
 }
 void Pushover::setDevice(String device)
 {
@@ -80,46 +87,64 @@ void Pushover::setHTML(boolean html)
 bool Pushover::send(void)
 {
 	bool success=false;
-	WiFiClientSecure *client = new WiFiClientSecure;
-
-	if (client)
-	{
-
-		client->setCACert(PUSHOVER_ROOT_CA);
-		{
-			if (client->connect("api.pushover.net", 443))
-			{
-				Serial.println("https connection established.");
-				String post = String("token=") + _token + "&user=" + _user + "&title=" + _title + "&message=" + _message + "&device=" + _device + "&url=" + _url + "&url_title=" + _url_title + "&priority=" + _priority + "&retry=" + _retry + "&expire=" + _expire + "&sound=" + _sound;
-				if (_timestamp != 0)
-					post += String("&timestamp=") + _timestamp;
-				if (_html == true)
-					post += String("&html=1");
-				String http = String("POST /1/messages.json HTTP/1.1\r\nHost: api.pushover.net\r\nConnection: close\r\nContent-Length: ") + post.length() + "\r\n\r\n" + post;
-				client->print(http);
-				int timeout_at = millis() + _timeout;
-				while (!client->available() && timeout_at - millis() < 0)
-				{
-					client->stop();
-					return false;
-				}
-				String line;
-				while (client->available() != 0)
-				{
-					if (client->read() == '{')
-						break;
-				}
-				line = client->readStringUntil('\n');
-				client->stop();
-				success=line.indexOf("\"status\":1") != -1 || line.indexOf("200 OK") != -1;
-			}
-			else
-			{
-				success=false;
-				client->stop();
-			}
-		}
-		delete client;
-	}
+	//WiFiClientSecure *client = new WiFiClientSecure;
+	HTTPClient myClient;
+	DynamicJsonDocument doc(512);
+	doc["token"]=_token;
+	doc["user"]=_user;
+	doc["message"]=_message;
+	char output[512];
+	serializeJson(doc, output);
+	if(myClient.begin("https://api.pushover.net/1/messages.xml", PUSHOVER_ROOT_CA))
+		Serial.println("Connection open.");
+	
+		
+	int code=myClient.POST(String("token=") + _token + "&user=" + _user + "&title=" + _title + "&message=" + _message + "&device=" + _device + "&url=" + _url + "&url_title=" + _url_title + "&priority=" + _priority + "&retry=" + _retry + "&expire=" + _expire + "&sound=" + _sound);
+	WiFiClient *client = myClient.getStreamPtr();
+	success = code==200;
+	Serial.println(code);
+	Serial.println(output);
+	while(client->available())
+		{Serial.write(client->read());}
 	return success;
+
+		
+	// 	{
+	// 		if (client->connect("api.pushover.net", 443))
+	// 		{
+	// 			Serial.println("https connection established.");
+	// 			String post = String("token=") + _token + "&user=" + _user + "&title=" + _title + "&message=" + _message + "&device=" + _device + "&url=" + _url + "&url_title=" + _url_title + "&priority=" + _priority + "&retry=" + _retry + "&expire=" + _expire + "&sound=" + _sound;
+	// 			if (_timestamp != 0)
+	// 				post += String("&timestamp=") + _timestamp;
+	// 			if (_html == true)
+	// 				post += String("&html=1");
+	// 			String http = String("POST /1/messages.json HTTP/1.1\r\nHost: api.pushover.net\r\nConnection: close\r\nContent-Length: ") + post.length() + "\r\n\r\n" + post;
+	// 			client->print(http);
+	// 			int timeout_at = millis() + _timeout;
+	// 			while (!client->available() && timeout_at - millis() < 0)
+	// 			{
+	// 				client->stop();
+	// 				return false;
+	// 			}
+	// 			String line;
+	// 			while (client->available() != 0)
+	// 			{
+	// 				if (client->read() == '{')
+	// 					break;
+	// 			}
+	// 			line = client->readStringUntil('\n');
+	// 			Serial.println(line);
+	// 			client->stop();
+	// 			success=line.indexOf("\"status\":1") != -1 || line.indexOf("200 OK") != -1;
+	// 		}
+	// 		else
+	// 		{
+	// 			success=false;
+	// 			client->stop();
+	// 		}
+	// 	}
+	// 	delete client;
+	// }
+	// Serial.println(success);
+	// return success;
 }
