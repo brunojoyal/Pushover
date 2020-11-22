@@ -30,6 +30,8 @@ private:
 
 public:
 	Pushover(String, String, bool);
+	void setToken(String);
+	void setUser(String);
 	void setMessage(String);
 	void setDevice(String);
 	void setTitle(String);
