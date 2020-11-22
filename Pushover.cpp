@@ -89,23 +89,15 @@ bool Pushover::send(void)
 	bool success=false;
 	//WiFiClientSecure *client = new WiFiClientSecure;
 	HTTPClient myClient;
-	DynamicJsonDocument doc(512);
-	doc["token"]=_token;
-	doc["user"]=_user;
-	doc["message"]=_message;
-	char output[512];
-	serializeJson(doc, output);
+	
 	if(myClient.begin("https://api.pushover.net/1/messages.xml", PUSHOVER_ROOT_CA))
 		Serial.println("Connection open.");
 	
 		
 	int code=myClient.POST(String("token=") + _token + "&user=" + _user + "&title=" + _title + "&message=" + _message + "&device=" + _device + "&url=" + _url + "&url_title=" + _url_title + "&priority=" + _priority + "&retry=" + _retry + "&expire=" + _expire + "&sound=" + _sound);
-	WiFiClient *client = myClient.getStreamPtr();
+	
 	success = code==200;
-	Serial.println(code);
-	Serial.println(output);
-	while(client->available())
-		{Serial.write(client->read());}
+	myClient.end();
 	return success;
 
 		
