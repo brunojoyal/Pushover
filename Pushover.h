@@ -14,7 +14,6 @@ class Pushover
 private:
 	String _token;
 	String _user;
-	bool _unsafe;
 	String _message;
 	String _device;
 	String _title;
@@ -44,5 +43,5 @@ public:
 	void setSound(String);
 	void setHTML(boolean);
 	void setTimeout(uint16_t);
-	boolean send(void);
+	int send(void);
 };

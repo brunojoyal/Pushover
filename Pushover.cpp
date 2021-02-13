@@ -22,11 +22,10 @@ const char *PUSHOVER_ROOT_CA = "-----BEGIN CERTIFICATE-----\n"
 							   "CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n"
 							   "-----END CERTIFICATE-----\n";
 
-Pushover::Pushover(String token, String user, bool unsafe = false)
+Pushover::Pushover(String token, String user)
 {
 	_token = token;
 	_user = user;
-	_unsafe = unsafe;
 }
 void Pushover::setMessage(String message)
 {
@@ -84,10 +83,9 @@ void Pushover::setHTML(boolean html)
 {
 	_html = html;
 }
-bool Pushover::send(void)
+int Pushover::send(void)
 {
 	bool success=false;
-	//WiFiClientSecure *client = new WiFiClientSecure;
 	HTTPClient myClient;
 	
 	myClient.begin("https://api.pushover.net/1/messages.json", PUSHOVER_ROOT_CA);
@@ -100,8 +98,7 @@ bool Pushover::send(void)
 	serializeJson(doc, output);
 	int code=myClient.POST(output);
 
-	success = code==200;
 	myClient.end();
-	return success;
+	return code;
 
 }
