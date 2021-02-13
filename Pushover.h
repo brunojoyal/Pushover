@@ -28,7 +28,7 @@ private:
 	String _sound;
 
 public:
-	Pushover(String, String, bool);
+	Pushover(String, String);
 	void setToken(String);
 	void setUser(String);
 	void setMessage(String);
