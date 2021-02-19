@@ -85,7 +85,7 @@ void Pushover::setHTML(boolean html)
 }
 int Pushover::send(void)
 {
-	bool success=false;
+	
 	HTTPClient myClient;
 	
 	myClient.begin("https://api.pushover.net/1/messages.json", PUSHOVER_ROOT_CA);
@@ -94,6 +94,14 @@ int Pushover::send(void)
 	doc["token"]=_token;
 	doc["user"]=_user;
 	doc["message"]=_message;
+	doc["title"]=_title;
+	doc["url"]=_url;
+	doc["url_title"]=_url_title;
+	doc["html"]=_html;
+	doc["priority"]=_priority;
+	doc["sound"]=_sound;
+
+	doc["timestamp"]=_timestamp;
 	char output[256];
 	serializeJson(doc, output);
 	int code=myClient.POST(output);

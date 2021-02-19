@@ -3,25 +3,17 @@
 #include <ArduinoJson.h>
 
 
-enum SafeMode
-{
-	SAFE = 0,
-	UNSAFE = 1
-};
-
 class Pushover
 {
 private:
-	String _token;
-	String _user;
-	String _message;
-	String _device;
-	String _title;
-	String _url;
-	String _url_title;
-	int8_t _priority = 0;
-	uint16_t _retry;
-	uint16_t _expire;
+	String _token="";
+	String _user="";
+	String _message="";
+	String _device="";
+	String _title="";
+	String _url="";
+	String _url_title="";
+	int8_t _priority = -1;
 	uint32_t _timestamp = 0;
 	boolean _html;
 	uint16_t _timeout = 5000;
