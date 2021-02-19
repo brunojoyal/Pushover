@@ -59,14 +59,6 @@ void Pushover::setPriority(int8_t priority)
 {
 	_priority = priority;
 }
-void Pushover::setRetry(uint16_t retry)
-{
-	_retry = retry;
-}
-void Pushover::setExpire(uint16_t expire)
-{
-	_expire = expire;
-}
 void Pushover::setTimestamp(uint32_t timestamp)
 {
 	_timestamp = timestamp;
